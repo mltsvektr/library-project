@@ -13,6 +13,7 @@ import ru.maltseva.libraryproject.model.Author;
 import ru.maltseva.libraryproject.repository.AuthorRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,13 @@ public class AuthorServiceImpl implements AuthorService {
         });
         Author author = authorRepository.findOne(specification).orElseThrow();
         return convertToDto(author);
+    }
+
+    @Override
+    public List<AuthorDto> getAllAuthors() {
+       return authorRepository.findAll().stream()
+               .map(author -> convertToDto(author))
+               .collect(Collectors.toList());
     }
 
     private AuthorDto convertToDto(Author author) {

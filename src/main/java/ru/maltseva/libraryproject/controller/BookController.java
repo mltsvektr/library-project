@@ -1,29 +1,19 @@
 package ru.maltseva.libraryproject.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import ru.maltseva.libraryproject.dto.BookCreateDto;
-import ru.maltseva.libraryproject.dto.BookDto;
-import ru.maltseva.libraryproject.dto.BookUpdateDto;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import ru.maltseva.libraryproject.service.BookService;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
 
-    @PostMapping("/book/create")
-    BookDto createBook(@RequestBody BookCreateDto bookCreateDto) {
-        return bookService.createBook(bookCreateDto);
-    }
-
-    @PutMapping("/book/update")
-    BookDto updateBook(@RequestBody BookUpdateDto bookUpdateDto) {
-        return bookService.updateBook(bookUpdateDto);
-    }
-
-    @DeleteMapping("/book/delete/{id}")
-    void deleteBook(@PathVariable("id") Long id) {
-        bookService.deleteBook(id);
+    @GetMapping("/books")
+    String getBooksView(Model model) {
+        model.addAttribute("books", bookService.getAllBooks());
+        return "books";
     }
 }

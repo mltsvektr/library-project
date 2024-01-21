@@ -2,6 +2,8 @@ package ru.maltseva.libraryproject.service;
 
 import ru.maltseva.libraryproject.dto.AuthorDto;
 
+import java.util.List;
+
 public interface AuthorService {
     AuthorDto getAuthorById(Long id);
 
@@ -10,4 +12,5 @@ public interface AuthorService {
     AuthorDto getAuthorByNameV2(String name);
 
     AuthorDto getAuthorByNameV3(String name);
+    List<AuthorDto> getAllAuthors();
 }

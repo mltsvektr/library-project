@@ -1,4 +1,4 @@
-package ru.maltseva.libraryproject.controller;
+package ru.maltseva.libraryproject.controller.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +10,7 @@ import ru.maltseva.libraryproject.service.GenreService;
 
 @RestController
 @RequiredArgsConstructor
-public class GenreController {
+public class GenreRestController {
 
     private final GenreService genreService;
 
