@@ -1,6 +1,11 @@
 package ru.maltseva.libraryproject.service;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.maltseva.libraryproject.dto.BookCreateDto;
 import ru.maltseva.libraryproject.dto.BookDto;
@@ -15,6 +20,33 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
+
+    @Override
+    public BookDto getByNameV1(String name) {
+        Book book = bookRepository.findBookByName(name).orElseThrow();
+        return convertEntityToDto(book);
+    }
+
+    @Override
+    public BookDto getByNameV2(String name) {
+        Book book = bookRepository.findBookByNameBySql(name).orElseThrow();
+        return convertEntityToDto(book);
+    }
+
+    @Override
+    public BookDto getByNameV3(String name) {
+        Specification<Book> specification = Specification.where(new Specification<Book>() {
+            @Override
+            public Predicate toPredicate(Root<Book> root,
+                                         CriteriaQuery<?> query,
+                                         CriteriaBuilder cb) {
+                return cb.equal(root.get("name"), name);
+            }
+        });
+
+        Book book = bookRepository.findOne(specification).orElseThrow();
+        return convertEntityToDto(book);
+    }
 
     @Override
     public BookDto createBook(BookCreateDto bookCreateDto) {

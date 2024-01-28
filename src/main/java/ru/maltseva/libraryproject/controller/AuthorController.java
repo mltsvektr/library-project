@@ -9,11 +9,11 @@ import ru.maltseva.libraryproject.service.AuthorService;
 @Controller
 @RequiredArgsConstructor
 public class AuthorController {
-   private final AuthorService authorService;
+    private final AuthorService authorService;
 
-   @GetMapping("/authors")
-    String getAllAuthors(Model model){
-       model.addAttribute("authors", authorService.getAllAuthors());
-       return "authors";
-   }
+    @GetMapping("/authors")
+    String getAllAuthors(Model model) {
+        model.addAttribute("authors", authorService.getAllAuthors());
+        return "authors";
+    }
 }
