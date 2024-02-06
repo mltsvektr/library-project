@@ -5,6 +5,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.maltseva.libraryproject.dto.BookCreateDto;
@@ -14,23 +15,42 @@ import ru.maltseva.libraryproject.model.Book;
 import ru.maltseva.libraryproject.repository.BookRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
 
     @Override
     public BookDto getByNameV1(String name) {
-        Book book = bookRepository.findBookByName(name).orElseThrow();
-        return convertEntityToDto(book);
+        log.info("Try to find book by name {}", name);
+        Optional<Book> book = bookRepository.findBookByName(name);
+        if (book.isPresent()) {
+            BookDto bookDto = convertEntityToDto(book.get());
+            log.info("Book: {}", bookDto.toString());
+            return bookDto;
+        } else {
+            log.error("Book with name {} not found", name);
+            throw new NoSuchElementException("No value present");
+        }
     }
 
     @Override
     public BookDto getByNameV2(String name) {
-        Book book = bookRepository.findBookByNameBySql(name).orElseThrow();
-        return convertEntityToDto(book);
+        log.info("Try to find book by name {}", name);
+        Optional<Book> book = bookRepository.findBookByName(name);
+        if (book.isPresent()) {
+            BookDto bookDto = convertEntityToDto(book.get());
+            log.info("Book: {}", bookDto.toString());
+            return bookDto;
+        } else {
+            log.error("Book with name {} not found", name);
+            throw new NoSuchElementException("No value present");
+        }
     }
 
     @Override
@@ -43,9 +63,16 @@ public class BookServiceImpl implements BookService {
                 return cb.equal(root.get("name"), name);
             }
         });
-
-        Book book = bookRepository.findOne(specification).orElseThrow();
-        return convertEntityToDto(book);
+        log.info("Try to find book by name {}", name);
+        Optional<Book> book = bookRepository.findBookByName(name);
+        if (book.isPresent()) {
+            BookDto bookDto = convertEntityToDto(book.get());
+            log.info("Book: {}", bookDto.toString());
+            return bookDto;
+        } else {
+            log.error("Book with name {} not found", name);
+            throw new NoSuchElementException("No value present");
+        }
     }
 
     @Override
@@ -57,17 +84,32 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto updateBook(BookUpdateDto bookUpdateDto) {
-        Book book = bookRepository.findById(bookUpdateDto.getId()).orElseThrow();
-        book.setName(bookUpdateDto.getName());
-        book.setGenre(bookUpdateDto.getGenre());
-        Book savedBook = bookRepository.save(book);
-        BookDto bookDto = convertEntityToDto(savedBook);
-        return bookDto;
+        log.info("Try to find book by id {}", bookUpdateDto.getId());
+        Optional<Book> book = bookRepository.findById(bookUpdateDto.getId());
+        if (book.isPresent()) {
+            book.get().setName(bookUpdateDto.getName());
+            book.get().setGenre(bookUpdateDto.getGenre());
+            Book savedBook = bookRepository.save(book.get());
+            BookDto bookDto = convertEntityToDto(savedBook);
+            log.info("Book: {}", bookDto.toString());
+            return bookDto;
+        } else {
+            log.error("Book with id {} is not found", bookUpdateDto.getId());
+            throw new NoSuchElementException("No value present");
+        }
     }
 
     @Override
     public void deleteBook(Long id) {
-        bookRepository.deleteById(id);
+        log.info("Try to find Book by id {}", id);
+        Optional<Book> book = bookRepository.findById(id);
+        if (book.isPresent()) {
+            bookRepository.deleteById(id);
+            log.info("Book with id {} is deleted", id);
+        } else {
+            log.error("Book with id {} is not found", id);
+            throw new NoSuchElementException("No value present");
+        }
     }
 
     @Override
